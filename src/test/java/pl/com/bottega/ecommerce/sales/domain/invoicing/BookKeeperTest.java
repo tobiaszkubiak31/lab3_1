@@ -79,4 +79,57 @@ class BookKeeperTest {
     }
 
 
+    @Test
+    void givenEmptyListOfItems_checkIfCalculateTaxZeroTimesCalled() {
+        BookKeeper bookKeeper = new BookKeeper(invoiceFactory);
+        TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
+
+        InvoiceRequest invoiceRequest = new InvoiceRequestBuilder()
+            .build();
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        verify(taxPolicy, times(0)).calculateTax(any(ProductType.class), any(Money.class));
+    }
+
+    @Test
+    void givenTwoItemAsRequestItem_checkIfCalculateTaxIsTwoTimesCalled() {
+        BookKeeper bookKeeper = new BookKeeper(invoiceFactory);
+        TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
+
+        when(taxPolicy.calculateTax(any(), any()))
+            .thenReturn(this.tax);
+
+        InvoiceRequest invoiceRequest = new InvoiceRequestBuilder()
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .build();
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        verify(taxPolicy, times(2)).calculateTax(any(ProductType.class), any(Money.class));
+        Assertions.assertEquals(2, invoice.getItems().size());
+    }
+
+    @Test
+    void givenTwoItemAsRequestItem_checkIfCalculateTaxIsFourTimesCalled() {
+        BookKeeper bookKeeper = new BookKeeper(invoiceFactory);
+        TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
+
+        when(taxPolicy.calculateTax(any(), any()))
+            .thenReturn(this.tax);
+
+        InvoiceRequest invoiceRequest = new InvoiceRequestBuilder()
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .addRequestItem(RequestItemBuilder.buildRequestItem())
+            .build();
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        verify(taxPolicy, times(4)).calculateTax(any(ProductType.class), any(Money.class));
+    }
+
+
 }
