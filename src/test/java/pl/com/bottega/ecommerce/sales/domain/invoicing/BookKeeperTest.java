@@ -108,7 +108,6 @@ class BookKeeperTest {
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
         verify(taxPolicy, times(2)).calculateTax(any(ProductType.class), any(Money.class));
-        Assertions.assertEquals(2, invoice.getItems().size());
     }
 
     @Test
